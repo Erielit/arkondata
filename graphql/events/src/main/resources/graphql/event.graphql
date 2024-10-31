@@ -1,0 +1,37 @@
+type Event {
+    id: ID
+    name: String
+    start: String
+    end: String
+    maxTickets: Int
+    createdAt: String
+    status: Boolean
+}
+
+input NewEvent {
+    name: String!
+    start: String!
+    end: String!
+    maxTickets: Int
+}
+
+input UpdateEvent {
+    id:ID
+    name: String!
+    start: String!
+    end: String!
+    maxTickets: Int!
+    createdAt: String!
+    status: Boolean!
+}
+
+extend type Mutation {
+    createEvent(event: NewEvent!): Event
+    updateEvent(event: UpdateEvent!): Event
+    changeStatus(id: ID!): Boolean
+}
+
+extend type Query {
+    events: [Event]
+    event(id: ID!): Event
+}

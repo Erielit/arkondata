@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  mysql_db:
+    image: mysql:8.0
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: customuser
+      MYSQL_PASSWORD: customuserpassword
+    ports:
+      - "3306:3306"
+    networks:
+      - my-bridge-network
+
+  graphqlapp:
+    build:
+      context: ./graphql/events/
+      dockerfile: Dockerfile
+    container_name: graphqlapp
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/events_db?useSSL=false&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql_db
+    networks:
+      - my-bridge-network
+
+  restfulapp:
+    build:
+      context: ./rest/events/
+      dockerfile: Dockerfile
+    container_name: restapp
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/events_db?useSSL=false&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    ports:
+      - "8081:8081"
+    depends_on:
+      - graphqlapp
+    networks:
+      - my-bridge-network
+
+networks:
+  my-bridge-network:
+    driver: bridge
